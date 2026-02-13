@@ -12,10 +12,26 @@ URLS=(
   "https://thetvdb.com/series/breaking-bad"
 )
 
-echo "Opening test URLs in Safari..."
-for url in "${URLS[@]}"; do
-  open -a Safari "$url"
-  sleep 0.5
+echo "Opening test URLs in a new Safari window..."
+
+# Open first URL in a new window, then add remaining as tabs
+osascript -e '
+tell application "Safari"
+  activate
+  make new document with properties {URL:"'"${URLS[0]}"'"}
+end tell
+'
+sleep 0.5
+
+for url in "${URLS[@]:1}"; do
+  osascript -e '
+  tell application "Safari"
+    tell front window
+      set newTab to make new tab with properties {URL:"'"$url"'"}
+    end tell
+  end tell
+  '
+  sleep 0.3
 done
 
 echo ""
