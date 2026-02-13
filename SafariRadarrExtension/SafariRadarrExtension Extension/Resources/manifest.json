@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
+  "default_locale": "en",
   "name": "Radarr Movie Adder",
   "short_name": "Radarr Adder",
   "version": "1.0.0",
-  "description": "Seamlessly add movies to your Radarr library directly from IMDB and Rotten Tomatoes movie pages. Features intelligent movie detection, automatic metadata lookup, and comprehensive logging for troubleshooting.",
+  "description": "Add movies to Radarr from IMDB, Rotten Tomatoes, TMDb, Letterboxd, and TheTVDB with one click.",
   "author": "Rafael Valim",
   "homepage_url": "https://github.com/rafael-valim/safari-arr-extensions",
   "icons": {

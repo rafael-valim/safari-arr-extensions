@@ -95,6 +95,24 @@ Safari{Radarr,Sonarr}Extension/
 
 Authentication: `X-Api-Key` header on all requests.
 
+## App Store Submission
+
+The project uses Fastlane for App Store automation. Key files:
+
+- **`fastlane/Fastfile`** — lanes: `build_radarr`, `build_sonarr`, `build_all`, `upload_metadata_*`, `upload_screenshots_*`, `upload_binary_*`, `release_radarr`, `release_sonarr`, `release_all`
+- **`fastlane/Deliverfile`** — deliver configuration (team ID, review settings)
+- **`fastlane/metadata_{radarr,sonarr}/{en-US,es-MX,fr-FR,pt-BR}/`** — App Store metadata text files
+- **`scripts/store-credentials.sh`** — one-time setup to store API credentials in macOS Keychain
+
+App Store Connect API credentials are read from **macOS Keychain** (preferred) with fallback to environment variables. To set up Keychain storage, run:
+```bash
+./scripts/store-credentials.sh
+```
+This stores Key ID, Issuer ID, and P8 key content under the Keychain service `safari-arr-fastlane`. Environment variables still work as a fallback (e.g., for CI):
+- `APP_STORE_CONNECT_API_KEY_KEY_ID`
+- `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
+- `APP_STORE_CONNECT_API_KEY_KEY`
+
 ## Important Conventions
 
 - The two extensions are structurally near-identical — changes to shared patterns should be applied to both

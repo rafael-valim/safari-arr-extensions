@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
+  "default_locale": "en",
   "name": "Sonarr TV Show Adder",
   "short_name": "Sonarr Adder",
   "version": "1.0.0",
-  "description": "Seamlessly add TV shows to your Sonarr library directly from TV show database websites. Features intelligent show detection, automatic metadata lookup, and comprehensive logging for troubleshooting.",
+  "description": "Add TV shows to Sonarr from IMDB, Rotten Tomatoes, TMDb, and TheTVDB with one click.",
   "author": "Rafael Valim",
   "homepage_url": "https://github.com/rafael-valim/safari-arr-extensions",
   "icons": {

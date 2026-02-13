@@ -23,11 +23,25 @@ APPS = {
 # Helpers
 # ---------------------------------------------------------------------------
 
+# Read a credential from macOS Keychain, falling back to an environment variable.
+# Note: macOS `security -w` returns hex-encoded output for passwords containing
+# newlines (like P8 keys). We detect and decode hex automatically.
+def keychain_or_env(account, env_var)
+  value = `security find-generic-password -s "safari-arr-fastlane" -a "#{account}" -w 2>/dev/null`.strip
+  if value.empty?
+    ENV[env_var]
+  elsif value.match?(/\A[0-9a-fA-F]+\z/) && value.length > 40
+    [value].pack("H*")
+  else
+    value
+  end
+end
+
 def api_key
   app_store_connect_api_key(
-    key_id: ENV["APP_STORE_CONNECT_API_KEY_KEY_ID"],
-    issuer_id: ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"],
-    key_content: ENV["APP_STORE_CONNECT_API_KEY_KEY"],
+    key_id: keychain_or_env("key_id", "APP_STORE_CONNECT_API_KEY_KEY_ID"),
+    issuer_id: keychain_or_env("issuer_id", "APP_STORE_CONNECT_API_KEY_ISSUER_ID"),
+    key_content: keychain_or_env("key_content", "APP_STORE_CONNECT_API_KEY_KEY"),
     is_key_content_base64: false,
     in_house: false,
   )
@@ -40,22 +54,41 @@ def build_app(app)
     configuration: "Release",
     output_directory: "build",
     output_name: "#{app[:name]}.app",
-    export_method: "app-store-connect",
+    export_method: "app-store",
     export_team_id: "CJXZNY36RV",
+    export_options: {
+      provisioningProfiles: {
+        app[:identifier] => "#{app[:identifier]} AppStore",
+        "#{app[:identifier]}.Extension" => "#{app[:identifier]}.Extension AppStore",
+      },
+    },
     clean: true,
   )
 end
 
 def upload_metadata_for(app)
-  deliver(
-    app_identifier: app[:identifier],
-    metadata_path: app[:metadata_path],
-    skip_binary_upload: true,
-    skip_screenshots: true,
-    skip_metadata: false,
-    force: true,
-    api_key: api_key,
-  )
+  begin
+    deliver(
+      app_identifier: app[:identifier],
+      metadata_path: app[:metadata_path],
+      platform: "osx",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      skip_metadata: false,
+      force: true,
+      api_key: api_key,
+      app_review_information: {},
+    )
+  rescue => e
+    # Workaround for fastlane/fastlane#20538: first-version apps crash on
+    # fetch_app_store_review_detail returning nil. Metadata is already
+    # uploaded by the time this error occurs, so we log and continue.
+    if e.message.include?("No data")
+      UI.important("⚠️  Metadata uploaded but review detail fetch failed (known first-version bug). Continuing...")
+    else
+      raise e
+    end
+  end
 end
 
 def upload_screenshots_for(app)
@@ -63,6 +96,7 @@ def upload_screenshots_for(app)
     app_identifier: app[:identifier],
     metadata_path: app[:metadata_path],
     screenshots_path: "fastlane/screenshots",
+    platform: "osx",
     skip_binary_upload: true,
     skip_screenshots: false,
     skip_metadata: true,
@@ -74,6 +108,7 @@ end
 def upload_binary_for(app)
   deliver(
     app_identifier: app[:identifier],
+    platform: "osx",
     skip_binary_upload: false,
     skip_screenshots: true,
     skip_metadata: true,
