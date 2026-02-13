@@ -3,6 +3,13 @@
 // Prevent multiple executions
 let extensionInitialized = false;
 
+// Respond to ping requests from the popup to verify content script is active
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'ping') {
+    sendResponse({ active: true });
+  }
+});
+
 function extractSeriesData() {
   const url = window.location.href;
   let title, year, imdbId, tvdbId, isSeries = false;
@@ -102,6 +109,41 @@ function extractSeriesData() {
         tvdbId = tmdbMatch[1]; // We'll use this as a placeholder for now
       }
     }
+  } else if (url.includes('rottentomatoes.com')) {
+    // Check if it's a TV series page
+    const isSeriesPage = /\/tv\//.test(url);
+
+    if (isSeriesPage) {
+      isSeries = true;
+
+      // Primary: extract from JSON-LD structured data
+      const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+      for (const script of jsonLdScripts) {
+        try {
+          const data = JSON.parse(script.textContent);
+          if (data['@type'] === 'TVSeries') {
+            title = data.name;
+            if (data.datePublished) {
+              const m = data.datePublished.match(/\d{4}/);
+              if (m) year = m[0];
+            }
+            break;
+          }
+        } catch (e) { /* ignore parse errors */ }
+      }
+
+      // Fallback: document title
+      if (!title) {
+        title = document.title.replace(/\s*\|?\s*Rotten Tomatoes.*$/i, '').trim();
+      }
+
+      // Fallback: year from visible metadata text
+      if (!year) {
+        const metaText = document.body?.innerText || '';
+        const yearMatch = metaText.match(/\b(19|20)\d{2}\b/);
+        if (yearMatch) year = yearMatch[0];
+      }
+    }
   } else if (url.includes('thetvdb.com')) {
     // Check if it's a series page
     const isSeriesPage = /\/series\//.test(url);
@@ -133,7 +175,7 @@ function extractSeriesData() {
 
   // Parse year to number
   if (year) {
-    const yearMatch = year.match(/\d{4}/);
+    const yearMatch = String(year).match(/\d{4}/);
     year = yearMatch ? parseInt(yearMatch[0]) : null;
   }
 
@@ -145,6 +187,12 @@ function findTitleElement() {
   const selectorsByHost = {
     'imdb.com': ['[data-testid="hero-title-block__title"]', 'h1'],
     'themoviedb.org': ['h1[data-testid="hero-title-block__title"]', 'h1'],
+    'rottentomatoes.com': [
+      '[data-qa="score-panel-series-title"]',
+      'rt-text[slot="title"]',
+      '.hero-text h1',
+      'h1',
+    ],
     'thetvdb.com': ['h1', '.series-title'],
   };
 
@@ -160,23 +208,31 @@ function findTitleElement() {
 }
 
 function injectNearTitle(container) {
-  const titleEl = findTitleElement();
-  if (titleEl && titleEl.parentElement) {
-    titleEl.parentElement.insertBefore(container, titleEl.nextSibling);
-  } else {
-    // Fallback: fixed position in top-right corner
-    container.style.position = 'fixed';
-    container.style.top = '10px';
-    container.style.right = '10px';
-    container.style.zIndex = '9999';
-    document.body.appendChild(container);
+  const hostname = window.location.hostname;
+  const useFixedPosition = hostname.includes('rottentomatoes.com');
+
+  if (!useFixedPosition) {
+    const titleEl = findTitleElement();
+    if (titleEl && titleEl.parentElement) {
+      container.style.position = 'relative';
+      container.style.zIndex = '1000';
+      titleEl.parentElement.insertBefore(container, titleEl.nextSibling);
+      return;
+    }
   }
+
+  // Fixed position top-right corner (fallback, or forced for RT)
+  container.style.position = 'fixed';
+  container.style.top = '10px';
+  container.style.right = '10px';
+  container.style.zIndex = '9999';
+  document.body.appendChild(container);
 }
 
 async function addButton() {
   // Only run on supported TV websites
   const hostname = window.location.hostname;
-  if (!hostname.includes('imdb.com') && !hostname.includes('themoviedb.org') && !hostname.includes('thetvdb.com')) {
+  if (!hostname.includes('imdb.com') && !hostname.includes('themoviedb.org') && !hostname.includes('thetvdb.com') && !hostname.includes('rottentomatoes.com')) {
     return; // Not a supported website, do nothing
   }
 
@@ -854,9 +910,16 @@ function getLogColor(level) {
   }
 }
 
-// Run when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', addButton);
-} else {
-  addButton();
+// Run when DOM is ready (skip when loaded as a CommonJS module for testing)
+if (typeof module === 'undefined' || !module.exports) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addButton);
+  } else {
+    addButton();
+  }
+}
+
+// Export for testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { extractSeriesData, findTitleElement };
 }

@@ -110,6 +110,41 @@ document.addEventListener('DOMContentLoaded', async () => {
   checkSaveButtonState();
   checkFetchButtonState();
 
+  // Check permission status on current tab
+  checkPermissionStatus();
+
+  async function checkPermissionStatus() {
+    const statusEl = document.getElementById('permissionStatus');
+    const supportedPatterns = [
+      /imdb\.com\/title\//,
+      /themoviedb\.org\/tv\//,
+      /thetvdb\.com\/series\//,
+      /rottentomatoes\.com\/tv\//,
+    ];
+
+    try {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tab = tabs[0];
+      if (!tab || !tab.url) return;
+
+      const isSupportedPage = supportedPatterns.some(p => p.test(tab.url));
+      if (!isSupportedPage) return;
+
+      try {
+        const response = await chrome.tabs.sendMessage(tab.id, { action: 'ping' });
+        if (response && response.active) {
+          statusEl.textContent = 'Extension is active on this page';
+          statusEl.className = 'status-active';
+        }
+      } catch {
+        statusEl.textContent = 'Extension needs permission for this website. Enable in Safari \u2192 Settings \u2192 Extensions \u2192 Sonarr \u2192 Website Access';
+        statusEl.className = 'status-no-permission';
+      }
+    } catch {
+      // Ignore — can't query tabs (e.g. popup opened from toolbar on new tab)
+    }
+  }
+
   // Incremental saving functions
   async function saveIncrementalSettings() {
     const host = hostInput.value.trim();

@@ -32,7 +32,9 @@
       "matches": [
         "https://www.imdb.com/title/*",
         "https://www.themoviedb.org/tv/*",
-        "https://thetvdb.com/series/*"
+        "https://thetvdb.com/series/*",
+        "https://www.thetvdb.com/series/*",
+        "https://www.rottentomatoes.com/tv/*"
       ],
       "js": ["content.js"]
     }

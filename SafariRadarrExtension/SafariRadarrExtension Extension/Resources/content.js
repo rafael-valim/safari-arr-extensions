@@ -3,6 +3,13 @@
 // Prevent multiple executions
 let extensionInitialized = false;
 
+// Respond to ping requests from the popup to verify content script is active
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'ping') {
+    sendResponse({ active: true });
+  }
+});
+
 function extractMovieData() {
   const url = window.location.href;
   let title, year, imdbId, tmdbId, isMovie = false;
@@ -229,7 +236,7 @@ function extractMovieData() {
 
   // Parse year to number
   if (year) {
-    const yearMatch = year.match(/\d{4}/);
+    const yearMatch = String(year).match(/\d{4}/);
     year = yearMatch ? parseInt(yearMatch[0]) : null;
   }
 
@@ -264,17 +271,25 @@ function findTitleElement() {
 }
 
 function injectNearTitle(container) {
-  const titleEl = findTitleElement();
-  if (titleEl && titleEl.parentElement) {
-    titleEl.parentElement.insertBefore(container, titleEl.nextSibling);
-  } else {
-    // Fallback: fixed position in top-right corner
-    container.style.position = 'fixed';
-    container.style.top = '10px';
-    container.style.right = '10px';
-    container.style.zIndex = '9999';
-    document.body.appendChild(container);
+  const hostname = window.location.hostname;
+  const useFixedPosition = hostname.includes('rottentomatoes.com');
+
+  if (!useFixedPosition) {
+    const titleEl = findTitleElement();
+    if (titleEl && titleEl.parentElement) {
+      container.style.position = 'relative';
+      container.style.zIndex = '1000';
+      titleEl.parentElement.insertBefore(container, titleEl.nextSibling);
+      return;
+    }
   }
+
+  // Fixed position top-right corner (fallback, or forced for RT)
+  container.style.position = 'fixed';
+  container.style.top = '10px';
+  container.style.right = '10px';
+  container.style.zIndex = '9999';
+  document.body.appendChild(container);
 }
 
 async function addButton() {
@@ -964,9 +979,16 @@ function getLogColor(level) {
 
 
 
-// Run when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', addButton);
-} else {
-  addButton();
+// Run when DOM is ready (skip when loaded as a CommonJS module for testing)
+if (typeof module === 'undefined' || !module.exports) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addButton);
+  } else {
+    addButton();
+  }
+}
+
+// Export for testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { extractMovieData, findTitleElement };
 }

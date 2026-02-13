@@ -265,6 +265,43 @@
         border-color: #c53030;
       }
     }
+
+    /* Permission status banner */
+    #permissionStatus {
+      display: none;
+      margin-bottom: 16px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    #permissionStatus.status-active {
+      display: block;
+      background-color: #d1f2eb;
+      color: #0d7f5c;
+      border: 1px solid #0d7f5c;
+    }
+
+    #permissionStatus.status-no-permission {
+      display: block;
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #permissionStatus.status-active {
+        background-color: rgba(13, 127, 92, 0.15);
+      }
+
+      #permissionStatus.status-no-permission {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+        border-color: #ffc107;
+      }
+    }
   </style>
 </head>
 <body>
@@ -274,6 +311,8 @@
       <h1 class="title">Sonarr Settings</h1>
       <p class="subtitle">Configure your Sonarr connection</p>
     </header>
+
+    <div id="permissionStatus"></div>
 
     <section class="form-section">
       <h2 class="section-title">Sonarr Connection</h2>
