@@ -113,6 +113,8 @@ This stores Key ID, Issuer ID, and P8 key content under the Keychain service `sa
 - `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
 - `APP_STORE_CONNECT_API_KEY_KEY`
 
+**On a new machine**, credentials and signing certificates can be restored from a separate private credentials repository. If Keychain entries are missing or certificate files are not present, ask the user for guidance on locating the credentials repo — do not guess or hardcode its location.
+
 ## Important Conventions
 
 - The two extensions are structurally near-identical — changes to shared patterns should be applied to both
