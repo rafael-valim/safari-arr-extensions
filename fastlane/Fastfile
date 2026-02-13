@@ -8,13 +8,13 @@ APPS = {
   radarr: {
     name: "SafariRadarrExtension",
     display: "Radarr Adder",
-    identifier: "valim.SafariRadarrExtension",
+    identifier: "com.RV.radarradder.webapp",
     metadata_path: "fastlane/metadata_radarr",
   },
   sonarr: {
     name: "SafariSonarrExtension",
     display: "Sonarr Adder",
-    identifier: "valim.SafariSonarrExtension",
+    identifier: "com.RV.sonarradder.webapp",
     metadata_path: "fastlane/metadata_sonarr",
   },
 }.freeze

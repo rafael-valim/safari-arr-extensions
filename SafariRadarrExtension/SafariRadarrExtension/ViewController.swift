@@ -9,7 +9,7 @@ import Cocoa
 import SafariServices
 import WebKit
 
-let extensionBundleIdentifier = "valim.SafariRadarrExtension.Extension"
+let extensionBundleIdentifier = "com.RV.radarradder.webapp.Extension"
 
 class ViewController: NSViewController, WKNavigationDelegate, WKScriptMessageHandler {
 

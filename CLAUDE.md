@@ -101,4 +101,4 @@ Authentication: `X-Api-Key` header on all requests.
 - Apple Design System styling: SF font, dark mode support via `prefers-color-scheme`, iOS-style accent colors (#007aff, #28a745, #ff3b30)
 - Settings are persisted in `chrome.storage.local` with keys: `{radarr,sonarr}Host`, `{radarr,sonarr}ApiKey`, `qualityProfileId`, `rootFolderPath`
 - Collapse state stored in `localStorage` per-site: `radarr-extension-collapsed` / `sonarr-extension-collapsed`
-- Bundle IDs follow pattern: `valim.Safari{Radarr,Sonarr}Extension.Extension`
+- Bundle IDs follow pattern: `com.RV.{radarradder,sonarradder}.webapp.Extension`

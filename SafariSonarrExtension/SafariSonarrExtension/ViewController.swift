@@ -9,7 +9,7 @@ import Cocoa
 import SafariServices
 import WebKit
 
-let extensionBundleIdentifier = "valim.SafariSonarrExtension.Extension"
+let extensionBundleIdentifier = "com.RV.sonarradder.webapp.Extension"
 
 class ViewController: NSViewController, WKNavigationDelegate, WKScriptMessageHandler {
 
