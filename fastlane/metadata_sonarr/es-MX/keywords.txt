@@ -1,0 +1,1 @@
+sonarr,series,tv,safari,extensión,descarga,media,plex,jellyfin,imdb,tmdb

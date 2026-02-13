@@ -1,0 +1,21 @@
+Radarr Adder es una extensión de Safari que te permite agregar películas a tu biblioteca de Radarr con un clic — directamente desde los sitios de películas que ya visitas.
+
+Cuando visitas la página de una película en cualquier sitio compatible, aparece un botón cerca del título. Haz clic para buscar la película y agregarla a Radarr al instante. Sin necesidad de cambiar de app ni copiar y pegar títulos.
+
+Sitios compatibles:
+- IMDB
+- Rotten Tomatoes
+- TMDb (The Movie Database)
+- Letterboxd
+- TheTVDB
+
+Características:
+- Agrega a Radarr con un clic desde cualquier página de película compatible
+- Detección automática de metadatos de la película (título, año, IMDB ID)
+- Elige perfil de calidad y carpeta raíz
+- Ve de un vistazo si una película ya está en tu biblioteca
+- URL del servidor Radarr y clave de API configurables
+- Interfaz limpia y nativa que se integra en cada sitio
+- Funciona totalmente en local — sin servidores externos, sin rastreo
+
+Requiere una instancia de Radarr accesible desde tu Mac.

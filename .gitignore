@@ -4,3 +4,17 @@ xcuserdata/
 DerivedData/
 build/
 node_modules/
+vendor/
+.bundle/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/README.md
+fastlane/screenshots/**/*.png
+fastlane/test_output
+fastlane/*.p8
+
+# Environment / credentials
+*.env
+*.env.*

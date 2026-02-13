@@ -1,0 +1,169 @@
+default_platform(:mac)
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+APPS = {
+  radarr: {
+    name: "SafariRadarrExtension",
+    display: "Radarr Adder",
+    identifier: "valim.SafariRadarrExtension",
+    metadata_path: "fastlane/metadata_radarr",
+  },
+  sonarr: {
+    name: "SafariSonarrExtension",
+    display: "Sonarr Adder",
+    identifier: "valim.SafariSonarrExtension",
+    metadata_path: "fastlane/metadata_sonarr",
+  },
+}.freeze
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def api_key
+  app_store_connect_api_key(
+    key_id: ENV["APP_STORE_CONNECT_API_KEY_KEY_ID"],
+    issuer_id: ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"],
+    key_content: ENV["APP_STORE_CONNECT_API_KEY_KEY"],
+    is_key_content_base64: false,
+    in_house: false,
+  )
+end
+
+def build_app(app)
+  build_mac_app(
+    project: "#{app[:name]}/#{app[:name]}.xcodeproj",
+    scheme: app[:name],
+    configuration: "Release",
+    output_directory: "build",
+    output_name: "#{app[:name]}.app",
+    export_method: "app-store-connect",
+    export_team_id: "CJXZNY36RV",
+    clean: true,
+  )
+end
+
+def upload_metadata_for(app)
+  deliver(
+    app_identifier: app[:identifier],
+    metadata_path: app[:metadata_path],
+    skip_binary_upload: true,
+    skip_screenshots: true,
+    skip_metadata: false,
+    force: true,
+    api_key: api_key,
+  )
+end
+
+def upload_screenshots_for(app)
+  deliver(
+    app_identifier: app[:identifier],
+    metadata_path: app[:metadata_path],
+    screenshots_path: "fastlane/screenshots",
+    skip_binary_upload: true,
+    skip_screenshots: false,
+    skip_metadata: true,
+    force: true,
+    api_key: api_key,
+  )
+end
+
+def upload_binary_for(app)
+  deliver(
+    app_identifier: app[:identifier],
+    skip_binary_upload: false,
+    skip_screenshots: true,
+    skip_metadata: true,
+    force: true,
+    api_key: api_key,
+  )
+end
+
+# ---------------------------------------------------------------------------
+# Lanes
+# ---------------------------------------------------------------------------
+
+platform :mac do
+
+  # --- Build ---
+
+  desc "Build Radarr Adder"
+  lane :build_radarr do
+    build_app(APPS[:radarr])
+  end
+
+  desc "Build Sonarr Adder"
+  lane :build_sonarr do
+    build_app(APPS[:sonarr])
+  end
+
+  desc "Build both extensions"
+  lane :build_all do
+    build_app(APPS[:radarr])
+    build_app(APPS[:sonarr])
+  end
+
+  # --- Upload metadata ---
+
+  desc "Upload Radarr metadata to App Store Connect"
+  lane :upload_metadata_radarr do
+    upload_metadata_for(APPS[:radarr])
+  end
+
+  desc "Upload Sonarr metadata to App Store Connect"
+  lane :upload_metadata_sonarr do
+    upload_metadata_for(APPS[:sonarr])
+  end
+
+  # --- Upload screenshots ---
+
+  desc "Upload Radarr screenshots to App Store Connect"
+  lane :upload_screenshots_radarr do
+    upload_screenshots_for(APPS[:radarr])
+  end
+
+  desc "Upload Sonarr screenshots to App Store Connect"
+  lane :upload_screenshots_sonarr do
+    upload_screenshots_for(APPS[:sonarr])
+  end
+
+  # --- Upload binary ---
+
+  desc "Upload Radarr binary to App Store Connect"
+  lane :upload_binary_radarr do
+    upload_binary_for(APPS[:radarr])
+  end
+
+  desc "Upload Sonarr binary to App Store Connect"
+  lane :upload_binary_sonarr do
+    upload_binary_for(APPS[:sonarr])
+  end
+
+  # --- Full release ---
+
+  desc "Build, upload binary, metadata, and screenshots for Radarr"
+  lane :release_radarr do
+    build_app(APPS[:radarr])
+    upload_binary_for(APPS[:radarr])
+    upload_metadata_for(APPS[:radarr])
+    upload_screenshots_for(APPS[:radarr])
+  end
+
+  desc "Build, upload binary, metadata, and screenshots for Sonarr"
+  lane :release_sonarr do
+    build_app(APPS[:sonarr])
+    upload_binary_for(APPS[:sonarr])
+    upload_metadata_for(APPS[:sonarr])
+    upload_screenshots_for(APPS[:sonarr])
+  end
+
+  desc "Full release for both extensions"
+  lane :release_all do
+    release_radarr
+    release_sonarr
+  end
+
+end

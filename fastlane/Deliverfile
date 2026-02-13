@@ -1,0 +1,6 @@
+team_id("CJXZNY36RV")
+submit_for_review(false)
+automatic_release(false)
+phased_release(false)
+skip_binary_upload(true)
+run_precheck_before_submit(false)

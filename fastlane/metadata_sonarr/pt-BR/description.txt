@@ -1,0 +1,20 @@
+Sonarr Adder é uma extensão do Safari que permite adicionar séries de TV à sua biblioteca do Sonarr com um clique — diretamente dos sites de TV que você já navega.
+
+Ao visitar a página de uma série em qualquer site compatível, um botão aparece próximo ao título. Clique nele para buscar a série e adicioná-la ao Sonarr instantaneamente. Sem precisar trocar de app ou copiar e colar títulos.
+
+Sites compatíveis:
+- IMDB
+- Rotten Tomatoes
+- TMDb (The Movie Database)
+- TheTVDB
+
+Recursos:
+- Adicione ao Sonarr com um clique em qualquer página de série compatível
+- Detecção automática de metadados da série (título, ano, IMDB ID)
+- Escolha o perfil de qualidade e pasta raiz
+- Veja rapidamente se uma série já está na sua biblioteca
+- URL do servidor Sonarr e chave de API configuráveis
+- Interface limpa e nativa que se integra a cada site
+- Funciona totalmente local — sem servidores externos, sem rastreamento
+
+Requer uma instância do Sonarr acessível pelo seu Mac.

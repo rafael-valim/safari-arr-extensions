@@ -1,0 +1,1 @@
+radarr,movies,safari,extension,download,media,plex,jellyfin,imdb,tmdb
