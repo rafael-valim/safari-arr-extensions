@@ -112,23 +112,40 @@ function extractMovieData() {
       if (match) imdbId = match[1];
     }
   } else if (url.includes('rottentomatoes.com')) {
-    // Check if it's a movie page (URL contains /m/)
     isMovie = /\/m\//.test(url);
 
     if (isMovie) {
-      // Extract from Rotten Tomatoes
-      title = document.querySelector('h1.title')?.textContent?.trim();
-      if (!title) {
-        title = document.querySelector('h1')?.textContent?.trim();
+      // Primary: extract from JSON-LD structured data
+      const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+      for (const script of jsonLdScripts) {
+        try {
+          const data = JSON.parse(script.textContent);
+          if (data['@type'] === 'Movie') {
+            title = data.name;
+            // Year from datePublished or dateCreated
+            if (data.datePublished) {
+              const m = data.datePublished.match(/\d{4}/);
+              if (m) year = m[0];
+            }
+            break;
+          }
+        } catch (e) { /* ignore parse errors */ }
       }
-      year = document.querySelector('time')?.textContent?.trim() || document.querySelector('[data-qa="movie-year"]')?.textContent?.trim();
 
-      // Try to extract TMDB ID from various sources
-      tmdbId = document.querySelector('meta[property="og:url"]')?.content?.match(/\/(\d+)\//)?.[1];
+      // Fallback: document title
+      if (!title) {
+        title = document.title.replace(/\s*\|?\s*Rotten Tomatoes.*$/i, '').trim();
+      }
 
-      // If not found, try other meta tags or page data
+      // Fallback: year from visible metadata text
+      if (!year) {
+        const metaText = document.body?.innerText || '';
+        const yearMatch = metaText.match(/\b(19|20)\d{2}\b/);
+        if (yearMatch) year = yearMatch[0];
+      }
+
+      // Try to find TMDb ID in page scripts
       if (!tmdbId) {
-        // Look for TMDB ID in page scripts or data attributes
         const scripts = document.querySelectorAll('script');
         for (const script of scripts) {
           const content = script.textContent || '';
@@ -140,7 +157,6 @@ function extractMovieData() {
         }
       }
 
-      // Ensure tmdbId is a valid number
       if (tmdbId && (isNaN(tmdbId) || tmdbId === '0')) {
         tmdbId = null;
       }
@@ -193,6 +209,22 @@ function extractMovieData() {
         tmdbId = null;
       }
     }
+  } else if (url.includes('thetvdb.com')) {
+    const isMoviePage = /\/movies\//.test(url);
+
+    if (isMoviePage) {
+      isMovie = true;
+
+      title = document.querySelector('h1')?.textContent?.trim() ||
+              document.querySelector('.movie-title')?.textContent?.trim();
+
+      if (!title) {
+        title = document.title.replace(/\s*-\s*TheTVDB\.com.*$/i, '').trim();
+      }
+
+      year = document.querySelector('.movie-year')?.textContent?.trim() ||
+             document.querySelector('.release-year')?.textContent?.trim();
+    }
   }
 
   // Parse year to number
@@ -209,8 +241,15 @@ function findTitleElement() {
   const selectorsByHost = {
     'imdb.com': ['[data-testid="hero-title-block__title"]', 'h1'],
     'themoviedb.org': ['h1[data-testid="hero-title-block__title"]', 'h1'],
-    'rottentomatoes.com': ['h1.title', 'h1'],
+    'rottentomatoes.com': [
+      '[data-qa="score-panel-movie-title"]',
+      'h1.title',
+      'h1',
+      'rt-text[slot="title"]',
+      '.hero-text h1',
+    ],
     'letterboxd.com': ['h1.headline-1', 'h1'],
+    'thetvdb.com': ['h1', '.movie-title'],
   };
 
   for (const [host, selectors] of Object.entries(selectorsByHost)) {
@@ -241,7 +280,7 @@ function injectNearTitle(container) {
 async function addButton() {
   // Only run on supported movie websites
   const hostname = window.location.hostname;
-  if (!hostname.includes('imdb.com') && !hostname.includes('rottentomatoes.com') && !hostname.includes('themoviedb.org') && !hostname.includes('letterboxd.com')) {
+  if (!hostname.includes('imdb.com') && !hostname.includes('rottentomatoes.com') && !hostname.includes('themoviedb.org') && !hostname.includes('letterboxd.com') && !hostname.includes('thetvdb.com')) {
     return; // Not a supported website, do nothing
   }
 
@@ -301,7 +340,7 @@ function showSettingsButton() {
     display: inline-flex;
     gap: 12px;
     align-items: center;
-    margin: 8px 0;
+    margin: 8px 8px 8px 0;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -372,7 +411,7 @@ function showMovieButton(movieData, radarrMovie) {
     flex-direction: row;
     align-items: center;
     gap: 8px;
-    margin: 8px 0;
+    margin: 8px 8px 8px 0;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

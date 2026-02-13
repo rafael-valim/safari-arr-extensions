@@ -236,7 +236,7 @@ function showSettingsButton() {
     display: inline-flex;
     gap: 12px;
     align-items: center;
-    margin: 8px 0;
+    margin: 8px 8px 8px 0;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -307,7 +307,7 @@ function showSeriesButton(seriesData, sonarrSeries) {
     flex-direction: row;
     align-items: center;
     gap: 8px;
-    margin: 8px 0;
+    margin: 8px 8px 8px 0;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

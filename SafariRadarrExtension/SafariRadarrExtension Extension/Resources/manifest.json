@@ -33,7 +33,8 @@
         "https://www.imdb.com/title/*",
         "https://www.rottentomatoes.com/m/*",
         "https://www.themoviedb.org/movie/*",
-        "https://letterboxd.com/film/*"
+        "https://letterboxd.com/film/*",
+        "https://thetvdb.com/movies/*"
       ],
       "js": ["content.js"]
     }
