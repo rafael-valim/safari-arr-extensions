@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sonarr Settings</title>
+  <style>
+    /* Apple Design System - San Francisco Font Stack */
+    body {
+      width: 400px;
+      height: 650px;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #1d1d1f;
+      background-color: #ffffff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-y: auto;
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      body {
+        color: #f5f5f7;
+        background-color: #1d1d1f;
+      }
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .title {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+      color: #1d1d1f;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #86868b;
+      margin: 0;
+    }
+
+    /* Form sections */
+    .form-section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: #1d1d1f;
+    }
+
+    /* Form groups */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #1d1d1f;
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #86868b;
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    /* Input styling */
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d2d2d7;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      background-color: #ffffff;
+      color: #1d1d1f;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #007aff;
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+
+    input[type="text"]:disabled,
+    select:disabled {
+      background-color: #f5f5f7;
+      color: #86868b;
+      cursor: not-allowed;
+    }
+
+    /* Dark mode inputs */
+    @media (prefers-color-scheme: dark) {
+      input[type="text"],
+      select {
+        background-color: #2c2c2e;
+        border-color: #48484a;
+        color: #f5f5f7;
+      }
+
+      input[type="text"]:focus,
+      select:focus {
+        border-color: #007aff;
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+      }
+
+      input[type="text"]:disabled,
+      select:disabled {
+        background-color: #1c1c1e;
+        color: #636366;
+      }
+
+      .title {
+        color: #f5f5f7;
+      }
+
+      .section-title {
+        color: #f5f5f7;
+      }
+
+      label {
+        color: #f5f5f7;
+      }
+    }
+
+    /* Button styling */
+    .btn {
+      display: inline-block;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      min-height: 32px;
+      box-sizing: border-box;
+    }
+
+    .btn-primary {
+      background-color: #007aff;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056cc;
+    }
+
+    .btn-primary:active {
+      background-color: #004499;
+    }
+
+    .btn-secondary {
+      background-color: #f5f5f7;
+      color: #007aff;
+      border: 1px solid #d2d2d7;
+    }
+
+    .btn-secondary:hover {
+      background-color: #e5e5ea;
+    }
+
+    .btn-secondary:active {
+      background-color: #d1d1d6;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Dark mode buttons */
+    @media (prefers-color-scheme: dark) {
+      .btn-secondary {
+        background-color: #48484a;
+        color: #007aff;
+        border-color: #636366;
+      }
+
+      .btn-secondary:hover {
+        background-color: #636366;
+      }
+
+      .btn-secondary:active {
+        background-color: #7c7c80;
+      }
+    }
+
+    /* Layout */
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .button-group .btn {
+      flex: 1;
+    }
+
+    /* Status messages */
+    .status-message {
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .status-success {
+      background-color: #d1f2eb;
+      color: #0d7f5c;
+      border: 1px solid #0d7f5c;
+    }
+
+    .status-error {
+      background-color: #fed7d7;
+      color: #c53030;
+      border: 1px solid #c53030;
+    }
+
+    /* Dark mode status */
+    @media (prefers-color-scheme: dark) {
+      .status-success {
+        background-color: rgba(13, 127, 92, 0.1);
+        border-color: #0d7f5c;
+      }
+
+      .status-error {
+        background-color: rgba(197, 48, 48, 0.1);
+        border-color: #c53030;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <img src="images/icon-64.png" alt="Sonarr Logo" class="logo">
+      <h1 class="title">Sonarr Settings</h1>
+      <p class="subtitle">Configure your Sonarr connection</p>
+    </header>
+
+    <section class="form-section">
+      <h2 class="section-title">Sonarr Connection</h2>
+
+      <div class="form-group">
+        <label for="sonarrHost">Sonarr Host</label>
+        <input type="text" id="sonarrHost" placeholder="http://localhost:8989">
+        <p class="help-text">Your Sonarr server URL and port</p>
+      </div>
+
+      <div class="form-group">
+        <label for="sonarrApiKey">Sonarr API Key</label>
+        <input type="text" id="sonarrApiKey" placeholder="Your API key">
+        <p class="help-text">Found in Sonarr Settings → General</p>
+      </div>
+
+      <button id="fetchSonarrConfig" class="btn btn-secondary">Fetch Configuration</button>
+    </section>
+
+    <section class="form-section">
+      <h2 class="section-title">Preferences</h2>
+
+      <div class="form-group">
+        <label for="qualityProfileId">Quality Profile</label>
+        <select id="qualityProfileId" disabled>
+          <option value="">Select a profile...</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="rootFolderPath">Root Folder</label>
+        <select id="rootFolderPath" disabled>
+          <option value="">Select a folder...</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="button-group">
+      <button id="save" class="btn btn-primary" disabled>Save Settings</button>
+      <button id="clear" class="btn btn-secondary">Clear Configuration</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

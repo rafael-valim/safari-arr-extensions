@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Radarr Movie Adder",
+  "short_name": "Radarr Adder",
+  "version": "1.0.0",
+  "description": "Seamlessly add movies to your Radarr library directly from IMDB and Rotten Tomatoes movie pages. Features intelligent movie detection, automatic metadata lookup, and comprehensive logging for troubleshooting.",
+  "author": "Safari Extension",
+  "homepage_url": "https://github.com/yourusername/safari-radarr-extension",
+  "icons": {
+    "48": "images/icon-48.png",
+    "64": "images/icon-64.png",
+    "128": "images/icon-128.png",
+    "256": "images/icon-256.png",
+    "512": "images/icon-512.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.imdb.com/title/*",
+        "https://www.rottentomatoes.com/m/*",
+        "https://www.themoviedb.org/movie/*",
+        "https://letterboxd.com/film/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Configure Radarr Connection"
+  },
+  "commands": {
+    "_execute_action": {
+      "description": ""
+    }
+  }
+}
