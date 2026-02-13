@@ -10,12 +10,14 @@ APPS = {
     display: "Radarr Adder",
     identifier: "com.RV.radarradder.webapp",
     metadata_path: "fastlane/metadata_radarr",
+    screenshots_path: "fastlane/screenshots_radarr",
   },
   sonarr: {
     name: "SafariSonarrExtension",
     display: "Sonarr Adder",
     identifier: "com.RV.sonarradder.webapp",
     metadata_path: "fastlane/metadata_sonarr",
+    screenshots_path: "fastlane/screenshots_sonarr",
   },
 }.freeze
 
@@ -95,7 +97,7 @@ def upload_screenshots_for(app)
   deliver(
     app_identifier: app[:identifier],
     metadata_path: app[:metadata_path],
-    screenshots_path: "fastlane/screenshots",
+    screenshots_path: app[:screenshots_path],
     platform: "osx",
     skip_binary_upload: true,
     skip_screenshots: false,
