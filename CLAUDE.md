@@ -15,9 +15,19 @@ Both are Manifest V3 Safari Web Extensions with identical architectural patterns
 Each extension is a standalone Xcode project — there is no shared code or monorepo build system.
 
 ```bash
-# Build (from Xcode or command line)
-xcodebuild -project SafariRadarrExtension/SafariRadarrExtension.xcodeproj -scheme SafariRadarrExtension build
-xcodebuild -project SafariSonarrExtension/SafariSonarrExtension.xcodeproj -scheme SafariSonarrExtension build
+# Build both extensions
+scripts/build.sh
+
+# Build one extension
+scripts/build.sh radarr
+scripts/build.sh sonarr
+
+# Build and open the host app (registers extension with Safari)
+scripts/deploy.sh          # both
+scripts/deploy.sh radarr   # just Radarr
+
+# Remove build artifacts
+scripts/clean.sh
 ```
 
 After building, enable the extension in Safari → Preferences → Extensions. To reload after code changes: Develop → Web Extension → Reload Extensions.
