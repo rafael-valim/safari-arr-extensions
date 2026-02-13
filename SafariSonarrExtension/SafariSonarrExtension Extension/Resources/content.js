@@ -140,6 +140,39 @@ function extractSeriesData() {
   return { title, year, imdbId, tvdbId, isSeries };
 }
 
+function findTitleElement() {
+  const hostname = window.location.hostname;
+  const selectorsByHost = {
+    'imdb.com': ['[data-testid="hero-title-block__title"]', 'h1'],
+    'themoviedb.org': ['h1[data-testid="hero-title-block__title"]', 'h1'],
+    'thetvdb.com': ['h1', '.series-title'],
+  };
+
+  for (const [host, selectors] of Object.entries(selectorsByHost)) {
+    if (hostname.includes(host)) {
+      for (const selector of selectors) {
+        const el = document.querySelector(selector);
+        if (el) return el;
+      }
+    }
+  }
+  return null;
+}
+
+function injectNearTitle(container) {
+  const titleEl = findTitleElement();
+  if (titleEl && titleEl.parentElement) {
+    titleEl.parentElement.insertBefore(container, titleEl.nextSibling);
+  } else {
+    // Fallback: fixed position in top-right corner
+    container.style.position = 'fixed';
+    container.style.top = '10px';
+    container.style.right = '10px';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+  }
+}
+
 async function addButton() {
   // Only run on supported TV websites
   const hostname = window.location.hostname;
@@ -196,17 +229,14 @@ async function addButton() {
 }
 
 function showSettingsButton() {
-  // Create container for buttons with Apple design
-  const buttonContainer = document.createElement('div');
-  buttonContainer.setAttribute('data-sonarr-extension', 'settings');
-  buttonContainer.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 10000;
-    display: flex;
+  // Create container for settings button with Apple design
+  const settingsContainer = document.createElement('div');
+  settingsContainer.setAttribute('data-sonarr-extension', 'settings');
+  settingsContainer.style.cssText = `
+    display: inline-flex;
     gap: 12px;
     align-items: center;
+    margin: 8px 0;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -219,10 +249,10 @@ function showSettingsButton() {
     background: #007aff;
     color: white;
     border: none;
-    padding: 12px 20px;
+    padding: 10px 16px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     transition: all 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
@@ -255,8 +285,8 @@ function showSettingsButton() {
     });
   };
 
-  buttonContainer.appendChild(settingsButton);
-  document.body.appendChild(buttonContainer);
+  settingsContainer.appendChild(settingsButton);
+  injectNearTitle(settingsContainer);
 }
 
 function showSeriesButton(seriesData, sonarrSeries) {
@@ -267,42 +297,32 @@ function showSeriesButton(seriesData, sonarrSeries) {
   const backgroundContainer = document.createElement('div');
   backgroundContainer.setAttribute('data-sonarr-extension', 'background');
   backgroundContainer.style.cssText = `
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 9999;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 12px;
-    padding: ${isCollapsed ? '8px 12px' : '12px 16px'};
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    padding: ${isCollapsed ? '6px 10px' : '8px 14px'};
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
+    margin: 8px 0;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: all 0.3s ease;
-    width: ${isCollapsed ? '40px' : 'auto'};
-    max-width: ${isCollapsed ? '40px' : 'none'};
-    min-width: ${isCollapsed ? '40px' : 'auto'};
   `;
 
   // Add extension label container (logo + text)
   const extensionLabelContainer = document.createElement('div');
   extensionLabelContainer.style.cssText = `
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: ${isCollapsed ? 'center' : 'flex-end'};
     gap: 6px;
-    margin-bottom: ${isCollapsed ? '0px' : '4px'};
-    align-self: ${isCollapsed ? 'center' : 'flex-end'};
     cursor: pointer;
     user-select: none;
     transition: all 0.3s ease;
-    width: ${isCollapsed ? '100%' : 'auto'};
   `;
 
   // Add extension logo
@@ -326,29 +346,13 @@ function showSeriesButton(seriesData, sonarrSeries) {
     color: #86868b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    max-width: ${isCollapsed ? '0px' : '140px'};
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.2;
-    display: ${isCollapsed ? 'none' : 'flex'};
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
+    display: ${isCollapsed ? 'none' : 'inline'};
     transition: all 0.3s ease;
-    opacity: ${isCollapsed ? '0' : '1'};
   `;
-
-  // Add collapse/expand indicator (only show when expanded)
-  if (!isCollapsed) {
-    const indicator = document.createElement('span');
-    indicator.textContent = '▼';
-    indicator.style.cssText = `
-      font-size: 8px;
-      transition: all 0.3s ease;
-    `;
-    extensionLabel.appendChild(indicator);
-  }
 
   // Add logo and label to container
   extensionLabelContainer.appendChild(extensionLogo);
@@ -360,13 +364,10 @@ function showSeriesButton(seriesData, sonarrSeries) {
   const buttonContainer = document.createElement('div');
   buttonContainer.setAttribute('data-sonarr-extension', 'series');
   buttonContainer.style.cssText = `
-    display: ${isCollapsed ? 'none' : 'flex'};
+    display: ${isCollapsed ? 'none' : 'inline-flex'};
     gap: 8px;
     align-items: center;
-    transition: all 0.3s ease;
-    max-height: ${isCollapsed ? '0px' : '200px'};
-    opacity: ${isCollapsed ? '0' : '1'};
-    overflow: hidden;
+    justify-content: center;
   `;
 
   // Create main Sonarr button
@@ -380,48 +381,28 @@ function showSeriesButton(seriesData, sonarrSeries) {
   // Add button container to background
   backgroundContainer.appendChild(buttonContainer);
 
-  // Make container clickable to toggle (AFTER buttonContainer is defined)
+  // Make label container clickable to toggle
   extensionLabelContainer.onclick = () => {
     const currentlyCollapsed = localStorage.getItem('sonarr-extension-collapsed') === 'true';
     const newCollapsedState = !currentlyCollapsed;
 
     localStorage.setItem('sonarr-extension-collapsed', newCollapsedState.toString());
 
-    // Update text and styling based on collapsed state
     if (newCollapsedState) {
       extensionLabel.textContent = '';
       extensionLabel.style.display = 'none';
-      extensionLabel.style.maxWidth = '0px';
-      extensionLabel.style.opacity = '0';
-      backgroundContainer.style.padding = '8px 12px';
-      backgroundContainer.style.maxWidth = '40px';
-      backgroundContainer.style.width = '40px';
+      backgroundContainer.style.padding = '6px 10px';
       buttonContainer.style.display = 'none';
-      buttonContainer.style.maxHeight = '0px';
-      buttonContainer.style.opacity = '0';
     } else {
       extensionLabel.textContent = 'Sonarr TV Show Adder';
-      extensionLabel.style.display = 'flex';
-      extensionLabel.style.maxWidth = '140px';
-      extensionLabel.style.opacity = '1';
-
-      // Add indicator back
-      const indicator = document.createElement('span');
-      indicator.textContent = '▼';
-      indicator.style.cssText = 'font-size: 8px; transition: all 0.3s ease;';
-      extensionLabel.appendChild(indicator);
-
-      backgroundContainer.style.padding = '12px 16px';
-      backgroundContainer.style.maxWidth = '';
-      backgroundContainer.style.width = '';
-      buttonContainer.style.display = 'flex';
-      buttonContainer.style.maxHeight = '200px';
-      buttonContainer.style.opacity = '1';
+      extensionLabel.style.display = 'inline';
+      backgroundContainer.style.padding = '8px 14px';
+      buttonContainer.style.display = 'inline-flex';
     }
   };
 
-  // Add to document
-  document.body.appendChild(backgroundContainer);
+  // Inject near title or fall back to fixed position
+  injectNearTitle(backgroundContainer);
 }
 
 function createSonarrButton(seriesData, sonarrSeries) {
@@ -431,10 +412,10 @@ function createSonarrButton(seriesData, sonarrSeries) {
     background: #007aff;
     color: white;
     border: none;
-    padding: 12px 20px;
+    padding: 10px 16px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     transition: all 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
@@ -579,7 +560,7 @@ function createLogsButton() {
     background: #6c757d;
     color: white;
     border: none;
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 12px;
