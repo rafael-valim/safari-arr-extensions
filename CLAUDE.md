@@ -5,8 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 Two Safari Web Extensions for adding media to *arr services:
-- **SafariRadarrExtension** — adds movies to Radarr from IMDB, Rotten Tomatoes, TMDb, Letterboxd
-- **SafariSonarrExtension** — adds TV shows to Sonarr from IMDB, TMDb, TheTVDB
+- **SafariRadarrExtension** — adds movies to Radarr from IMDB, Rotten Tomatoes, TMDb, Letterboxd, TheTVDB
+- **SafariSonarrExtension** — adds TV shows to Sonarr from IMDB, TMDb, TheTVDB, Rotten Tomatoes
 
 Both are Manifest V3 Safari Web Extensions with identical architectural patterns.
 
@@ -32,7 +32,20 @@ scripts/clean.sh
 
 After building, enable the extension in Safari → Preferences → Extensions. To reload after code changes: Develop → Web Extension → Reload Extensions.
 
-No npm, no bundler, no test framework — JavaScript files are plain ES6+ loaded directly by Safari.
+No bundler — JavaScript files are plain ES6+ loaded directly by Safari.
+
+### Testing
+
+```bash
+# Install dev dependencies (Jest + jsdom)
+npm install
+
+# Run unit tests (17 tests across both extensions)
+npm test
+
+# Open test URLs in Safari for manual verification
+scripts/test.sh
+```
 
 ## Architecture
 
@@ -66,7 +79,8 @@ Safari{Radarr,Sonarr}Extension/
 - **background.js** handles all API calls, stores settings in `chrome.storage.local`, and maintains an in-memory log buffer (max 50 entries)
 - **Message actions**: `addMovie`/`addSeries`, `checkMovieExists`/`checkSeriesExists`, `getRadarrConfig`/`getSonarrConfig`, `getLogs`
 - All async message handlers `return true` to keep the message channel open for `sendResponse`
-- UI buttons are injected as fixed-position elements in the top-right corner of matched pages
+- UI buttons are injected near the page title (or fixed top-right corner on Rotten Tomatoes)
+- **Popup** pings the content script to show a permission status banner (green = active, orange = needs website access)
 
 ### API Endpoints Used
 

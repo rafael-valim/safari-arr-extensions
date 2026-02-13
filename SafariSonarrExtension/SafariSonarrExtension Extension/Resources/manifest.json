@@ -4,8 +4,8 @@
   "short_name": "Sonarr Adder",
   "version": "1.0.0",
   "description": "Seamlessly add TV shows to your Sonarr library directly from TV show database websites. Features intelligent show detection, automatic metadata lookup, and comprehensive logging for troubleshooting.",
-  "author": "Safari Extension",
-  "homepage_url": "https://github.com/yourusername/safari-sonarr-extension",
+  "author": "Rafael Valim",
+  "homepage_url": "https://github.com/rafael-valim/safari-arr-extensions",
   "icons": {
     "48": "images/icon-48.png",
     "64": "images/icon-64.png",

@@ -1,5 +1,14 @@
 {
+  "name": "safari-arr-extensions",
+  "version": "1.0.0",
+  "description": "Safari Web Extensions for adding movies to Radarr and TV shows to Sonarr",
   "private": true,
+  "author": "Rafael Valim",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rafael-valim/safari-arr-extensions.git"
+  },
   "scripts": {
     "test": "jest"
   },

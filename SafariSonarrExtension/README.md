@@ -16,9 +16,10 @@ A Safari Web Extension that allows you to seamlessly add TV shows to your Sonarr
 
 ## Supported Websites
 
-- **IMDB** (`imdb.com/title/*`) - TV series pages
-- **The Movie Database** (`themoviedb.org/tv/*`) - TV show pages
-- **The TVDB** (`thetvdb.com/series/*`) - Series pages
+- **IMDB** (`imdb.com/title/*`) — TV series pages (movies are filtered out)
+- **The Movie Database** (`themoviedb.org/tv/*`) — TV show pages
+- **TheTVDB** (`thetvdb.com/series/*`) — series pages
+- **Rotten Tomatoes** (`rottentomatoes.com/tv/*`) — TV series pages
 
 ## Installation
 
