@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 require('./setup');
 
 const CONTENT_JS_PATH = '../SafariRadarrExtension/SafariRadarrExtension Extension/Resources/content.js';
