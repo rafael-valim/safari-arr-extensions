@@ -24,3 +24,6 @@ fastlane/*.p8
 # Environment / credentials
 *.env
 *.env.*
+
+# Claude Code local settings (may contain API keys)
+.claude/

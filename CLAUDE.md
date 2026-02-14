@@ -40,7 +40,9 @@ No bundler — JavaScript files are plain ES6+ loaded directly by Safari.
 # Install dev dependencies (Jest + jsdom)
 npm install
 
-# Run unit tests (17 tests across both extensions)
+# Run unit tests (19 tests across both extensions)
+# Requires Node 22 — Jest hangs on Node 24. Use .node-version or:
+#   /opt/homebrew/opt/node@22/bin/node ./node_modules/jest/bin/jest.js
 npm test
 
 # Open test URLs in Safari for manual verification
@@ -104,16 +106,7 @@ The project uses Fastlane for App Store automation. Key files:
 - **`fastlane/metadata_{radarr,sonarr}/{en-US,es-MX,fr-FR,pt-BR}/`** — App Store metadata text files
 - **`scripts/store-credentials.sh`** — one-time setup to store API credentials in macOS Keychain
 
-App Store Connect API credentials are read from **macOS Keychain** (preferred) with fallback to environment variables. To set up Keychain storage, run:
-```bash
-./scripts/store-credentials.sh
-```
-This stores Key ID, Issuer ID, and P8 key content under the Keychain service `safari-arr-fastlane`. Environment variables still work as a fallback (e.g., for CI):
-- `APP_STORE_CONNECT_API_KEY_KEY_ID`
-- `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
-- `APP_STORE_CONNECT_API_KEY_KEY`
-
-**On a new machine**, credentials, signing certificates, and project-specific notes are stored in a private companion repository (`secure-items`) cloned alongside this repo at `../secure-items/`. Run its `restore.sh` to populate Keychain and copy certificates. See the companion repo's CLAUDE.md for full architecture details and per-project sensitive notes.
+Credentials, signing certificates, and operational notes are stored in the private companion repository (`secure-items`) cloned alongside this repo at `../secure-items/`. On a new machine, run its `restore.sh` to populate Keychain. See the companion repo's CLAUDE.md for full details.
 
 ## Important Conventions
 
@@ -121,4 +114,4 @@ This stores Key ID, Issuer ID, and P8 key content under the Keychain service `sa
 - Apple Design System styling: SF font, dark mode support via `prefers-color-scheme`, iOS-style accent colors (#007aff, #28a745, #ff3b30)
 - Settings are persisted in `chrome.storage.local` with keys: `{radarr,sonarr}Host`, `{radarr,sonarr}ApiKey`, `qualityProfileId`, `rootFolderPath`
 - Collapse state stored in `localStorage` per-site: `radarr-extension-collapsed` / `sonarr-extension-collapsed`
-- Bundle IDs follow pattern: `com.RV.{radarradder,sonarradder}.webapp.Extension`
+- Bundle IDs: `com.RV.radarradder.webapp` / `com.RV.sonarradder.webapp` (extensions: `.Extension` suffix)

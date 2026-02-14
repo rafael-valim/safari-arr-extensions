@@ -44,13 +44,7 @@ Then enable in Safari → Settings → Extensions and grant website access.
 
 ## Credentials & Signing
 
-App Store Connect API credentials are stored in macOS Keychain (service: `safari-arr-fastlane`). To set up on this machine:
-
-```bash
-./scripts/store-credentials.sh
-```
-
-**New machine?** Credentials and signing certificates are backed up in a separate private repository with a restore script that imports Keychain credentials and copies certificates automatically.
+Credentials, signing certificates, and Keychain setup instructions are stored in a separate private companion repository. See that repo's notes for setup on a new machine.
 
 ## Development
 

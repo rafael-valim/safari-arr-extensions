@@ -22,7 +22,13 @@
   "web_accessible_resources": [
     {
       "resources": ["images/*"],
-      "matches": ["<all_urls>"]
+      "matches": [
+        "https://www.imdb.com/*",
+        "https://www.rottentomatoes.com/*",
+        "https://www.themoviedb.org/*",
+        "https://thetvdb.com/*",
+        "https://www.thetvdb.com/*"
+      ]
     }
   ],
   "background": {
