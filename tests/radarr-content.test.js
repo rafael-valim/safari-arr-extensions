@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 require('./setup');
 
 const CONTENT_JS_PATH = '../SafariRadarrExtension/SafariRadarrExtension Extension/Resources/content.js';
@@ -151,14 +147,19 @@ describe('Radarr content.js — extractMovieData', () => {
     expect(result.isMovie).toBe(false);
   });
 
-  test('Letterboxd movie page returns isMovie: true', () => {
+  test('Letterboxd movie page extracts from JSON-LD', () => {
     const { extractMovieData } = loadContentScript(
       'https://letterboxd.com/film/inception/',
       () => {
-        document.body.innerHTML = `
-          <h1 class="headline-1">Inception</h1>
-          <span class="year">2010</span>
-        `;
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.textContent = JSON.stringify({
+          '@type': 'Movie',
+          name: 'Inception',
+          datePublished: '2010-07-16',
+        });
+        document.head.appendChild(script);
+        document.body.innerHTML = '<h1>Inception</h1>';
       }
     );
 
@@ -166,5 +167,48 @@ describe('Radarr content.js — extractMovieData', () => {
     expect(result.isMovie).toBe(true);
     expect(result.title).toBe('Inception');
     expect(result.year).toBe(2010);
+  });
+
+  test('Letterboxd movie page falls back to DOM when no JSON-LD', () => {
+    const { extractMovieData } = loadContentScript(
+      'https://letterboxd.com/film/the-dark-knight/',
+      () => {
+        document.body.innerHTML = `
+          <h1>The Dark Knight</h1>
+          <a href="/films/year/2008/">2008</a>
+        `;
+      }
+    );
+
+    const result = extractMovieData();
+    expect(result.isMovie).toBe(true);
+    expect(result.title).toBe('The Dark Knight');
+    expect(result.year).toBe(2008);
+  });
+
+  test('Letterboxd movie page extracts TMDb ID from scripts', () => {
+    const { extractMovieData } = loadContentScript(
+      'https://letterboxd.com/film/inception/',
+      () => {
+        const jsonLd = document.createElement('script');
+        jsonLd.type = 'application/ld+json';
+        jsonLd.textContent = JSON.stringify({
+          '@type': 'Movie',
+          name: 'Inception',
+          datePublished: '2010-07-16',
+        });
+        document.head.appendChild(jsonLd);
+
+        const dataScript = document.createElement('script');
+        dataScript.textContent = 'var filmData = {"tmdbId": 27205};';
+        document.head.appendChild(dataScript);
+
+        document.body.innerHTML = '<h1>Inception</h1>';
+      }
+    );
+
+    const result = extractMovieData();
+    expect(result.isMovie).toBe(true);
+    expect(result.tmdbId).toBe('27205');
   });
 });

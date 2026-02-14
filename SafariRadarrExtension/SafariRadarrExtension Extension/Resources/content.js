@@ -175,28 +175,44 @@ function extractMovieData() {
     if (isMoviePage) {
       isMovie = true;
 
-      // Extract from Letterboxd
-      // Title is usually in the h1 with class "headline-1" or similar
-      title = document.querySelector('h1.headline-1')?.textContent?.trim() ||
-              document.querySelector('h1')?.textContent?.trim() ||
-              document.querySelector('[data-film-name]')?.textContent?.trim();
-
-      if (!title) {
-        // Fallback to page title - remove " - Letterboxd" suffix
-        const pageTitle = document.title;
-        title = pageTitle.replace(' - Letterboxd', '').trim();
+      // Primary: extract from JSON-LD structured data
+      const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+      for (const script of jsonLdScripts) {
+        try {
+          const data = JSON.parse(script.textContent);
+          if (data['@type'] === 'Movie') {
+            title = data.name;
+            if (data.datePublished) {
+              const m = data.datePublished.match(/\d{4}/);
+              if (m) year = m[0];
+            } else if (data.releasedEvent) {
+              const m = JSON.stringify(data.releasedEvent).match(/\d{4}/);
+              if (m) year = m[0];
+            }
+            break;
+          }
+        } catch (e) { /* ignore parse errors */ }
       }
 
-      // Extract year - usually in a span with class "year" or similar
-      year = document.querySelector('span.year')?.textContent?.trim() ||
-             document.querySelector('.year')?.textContent?.trim() ||
-             document.querySelector('[data-film-year]')?.textContent?.trim();
+      // Fallback: DOM selectors
+      if (!title) {
+        title = document.querySelector('h1')?.textContent?.trim();
+      }
 
-      // Try to extract TMDB ID from meta tags or scripts
-      tmdbId = document.querySelector('meta[name="twitter:data1"]')?.content?.match(/tmdb:\/\/(\d+)/)?.[1] ||
-               document.querySelector('meta[property="og:url"]')?.content?.match(/\/(\d+)$/)?.[1];
+      if (!title) {
+        title = document.title.replace(/\s*[-|]\s*Letterboxd.*$/i, '').trim();
+      }
 
-      // If not found, look in scripts for TMDB data
+      // Fallback: year from link href pattern /films/year/YYYY/
+      if (!year) {
+        const yearLink = document.querySelector('a[href*="/films/year/"]');
+        if (yearLink) {
+          const m = yearLink.getAttribute('href').match(/\/films\/year\/(\d{4})/);
+          if (m) year = m[0].match(/\d{4}/)[0];
+        }
+      }
+
+      // Try to extract TMDB ID from page scripts
       if (!tmdbId) {
         const scripts = document.querySelectorAll('script');
         for (const script of scripts) {

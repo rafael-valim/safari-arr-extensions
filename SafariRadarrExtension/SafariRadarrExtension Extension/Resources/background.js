@@ -109,6 +109,7 @@ async function addMovieToRadarr(movieData) {
 
       if (lookupUrl) {
         const lookupResponse = await fetch(lookupUrl, {
+          redirect: 'error',
           headers: { 'X-Api-Key': settings.radarrApiKey }
         });
 
@@ -162,6 +163,7 @@ async function addMovieToRadarr(movieData) {
 
   const response = await fetch(url, {
     method: 'POST',
+    redirect: 'error',
     headers: {
       'Content-Type': 'application/json',
       'X-Api-Key': settings.radarrApiKey
@@ -195,6 +197,7 @@ async function addMovieToRadarr(movieData) {
 
     const searchResponse = await fetch(searchUrl, {
       method: 'POST',
+      redirect: 'error',
       headers: {
         'Content-Type': 'application/json',
         'X-Api-Key': settings.radarrApiKey
@@ -227,6 +230,7 @@ async function checkMovieExists(movieData) {
     const url = `${settings.radarrHost}/api/v3/movie`;
 
     const response = await fetch(url, {
+      redirect: 'error',
       headers: { 'X-Api-Key': settings.radarrApiKey }
     });
 

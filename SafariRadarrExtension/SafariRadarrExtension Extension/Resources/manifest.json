@@ -45,9 +45,4 @@
     "default_popup": "popup.html",
     "default_title": "Configure Radarr Connection"
   },
-  "commands": {
-    "_execute_action": {
-      "description": ""
-    }
-  }
 }

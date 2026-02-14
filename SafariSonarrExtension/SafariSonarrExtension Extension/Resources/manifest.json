@@ -44,9 +44,4 @@
     "default_popup": "popup.html",
     "default_title": "Configure Sonarr Connection"
   },
-  "commands": {
-    "_execute_action": {
-      "description": ""
-    }
-  }
 }

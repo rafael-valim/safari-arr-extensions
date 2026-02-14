@@ -280,6 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       // Fetch quality profiles
       const profilesResponse = await fetch(`${host}/api/v3/qualityprofile`, {
+        redirect: 'error',
         headers: { 'X-Api-Key': apiKey }
       });
 
@@ -303,6 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Fetch root folders
       const foldersResponse = await fetch(`${host}/api/v3/rootfolder`, {
+        redirect: 'error',
         headers: { 'X-Api-Key': apiKey }
       });
 

@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 require('./setup');
 
 const CONTENT_JS_PATH = '../SafariSonarrExtension/SafariSonarrExtension Extension/Resources/content.js';

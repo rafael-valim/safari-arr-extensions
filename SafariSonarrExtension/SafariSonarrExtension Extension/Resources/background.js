@@ -109,6 +109,7 @@ async function addSeriesToSonarr(seriesData) {
 
       if (lookupUrl) {
         const lookupResponse = await fetch(lookupUrl, {
+          redirect: 'error',
           headers: { 'X-Api-Key': settings.sonarrApiKey }
         });
 
@@ -167,6 +168,7 @@ async function addSeriesToSonarr(seriesData) {
 
   const response = await fetch(url, {
     method: 'POST',
+    redirect: 'error',
     headers: {
       'Content-Type': 'application/json',
       'X-Api-Key': settings.sonarrApiKey
@@ -200,6 +202,7 @@ async function addSeriesToSonarr(seriesData) {
 
     const searchResponse = await fetch(searchUrl, {
       method: 'POST',
+      redirect: 'error',
       headers: {
         'Content-Type': 'application/json',
         'X-Api-Key': settings.sonarrApiKey
@@ -232,6 +235,7 @@ async function checkSeriesExists(seriesData) {
     const url = `${settings.sonarrHost}/api/v3/series`;
 
     const response = await fetch(url, {
+      redirect: 'error',
       headers: { 'X-Api-Key': settings.sonarrApiKey }
     });
 
